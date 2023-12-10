@@ -2,6 +2,7 @@ package com.teste.scrd.service;
 
 import com.teste.scrd.model.Assembleia;
 import com.teste.scrd.repository.AssembleiaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class AssembleiaService {
 
     @Autowired
@@ -42,7 +44,7 @@ public class AssembleiaService {
     }
 
     public void delete(Long id) {
-        assembleiaRepository.deleteByIdPauta(id)
+        assembleiaRepository.deleteByIdAssembleia(id)
                 .orElseThrow(()-> new RuntimeException("Assembleia não encontrada"));
     }
 }

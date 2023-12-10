@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface AssembleiaRepository extends JpaRepository<Assembleia, Long> {
     Optional<Assembleia> findByIdAssembleia(Long idAssembleia);
 
-    Optional<Assembleia> deleteByIdPauta(Long id);
+    Optional<Assembleia> deleteByIdAssembleia(Long id);
 }

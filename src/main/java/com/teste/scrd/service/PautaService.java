@@ -2,6 +2,7 @@ package com.teste.scrd.service;
 
 import com.teste.scrd.model.Pauta;
 import com.teste.scrd.repository.PautaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class PautaService {
     @Autowired
     private PautaRepository pautaRepository;
