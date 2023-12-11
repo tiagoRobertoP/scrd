@@ -4,3 +4,13 @@ spring:
     username: root
     password: root
     driverClassName: com.mysql.cj.jdbc.Driver
+
+logging:
+  level:
+    root: info
+
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true

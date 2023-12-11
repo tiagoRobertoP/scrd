@@ -1,5 +1,7 @@
 package com.teste.scrd.service;
 
+import com.teste.scrd.enums.Errors;
+import com.teste.scrd.exceptions.PautaException;
 import com.teste.scrd.model.Pauta;
 import com.teste.scrd.repository.PautaRepository;
 import jakarta.transaction.Transactional;
@@ -15,8 +17,10 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PautaService {
-    @Autowired
     private PautaRepository pautaRepository;
+    public PautaService(PautaRepository pautaRepository) {
+        this.pautaRepository = pautaRepository;
+    }
 
     public Page<Pauta> get(Pageable pageable) {
         List<Pauta> pautaList = pautaRepository.findAll();
@@ -33,17 +37,20 @@ public class PautaService {
         return pautaRepository.save(pauta);
     }
 
-    public Pauta update(Pauta pauta) {
+    public Pauta update(Pauta pauta) throws PautaException {
         Pauta pautaData = pautaRepository.findByIdPauta(pauta.getIdPauta())
-                .orElseThrow(()-> new RuntimeException("Pauta não encontrada"));
+                .orElseThrow(()-> new PautaException(Errors.PAUTA_NOT_FOUND));
         return pautaRepository.save(Pauta.builder()
                 .idPauta(pautaData.getIdPauta())
                 .descricao(pauta.getDescricao())
                 .build());
     }
 
-    public void delete(Long id) {
-        pautaRepository.deleteByIdPauta(id)
-                .orElseThrow(()-> new RuntimeException("Pauta não encontrada"));
+    public Boolean delete(Long id) throws PautaException {
+        Pauta pautaData = pautaRepository.findByIdPauta(id)
+                .orElseThrow(()-> new PautaException(Errors.PAUTA_NOT_FOUND));
+        pautaRepository.deleteByIdPauta(pautaData.getIdPauta());
+
+        return true;
     }
 }

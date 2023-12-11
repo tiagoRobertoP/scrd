@@ -1,5 +1,7 @@
 package com.teste.scrd.service;
 
+import com.teste.scrd.enums.Errors;
+import com.teste.scrd.exceptions.AssociadoException;
 import com.teste.scrd.model.Associado;
 import com.teste.scrd.repository.AssociadoRepository;
 import jakarta.transaction.Transactional;
@@ -15,9 +17,11 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class AssociadoService {
-
-    @Autowired
     private AssociadoRepository associadoRepository;
+
+    AssociadoService(AssociadoRepository associadoRepository){
+        this.associadoRepository =associadoRepository;
+    }
 
     public Page<Associado> get(Pageable pageable) {
         List<Associado> associadoList = associadoRepository.findAll();
@@ -34,9 +38,9 @@ public class AssociadoService {
         return associadoRepository.save(associado);
     }
 
-    public Associado update(Associado associado) {
+    public Associado update(Associado associado) throws AssociadoException {
         Associado associadoData = associadoRepository.findByIdAssociado(associado.getIdAssociado())
-                .orElseThrow(()-> new RuntimeException("Associado não encontrado"));
+                .orElseThrow(()-> new AssociadoException(Errors.ASSOCIADO_NOT_FOUND));
         return associadoRepository.save(Associado.builder()
                         .idAssociado(associadoData.getIdAssociado())
                         .cpf(associado.getCpf())
@@ -44,8 +48,11 @@ public class AssociadoService {
                 .build());
     }
 
-    public void delete(Long id) {
-        associadoRepository.deleteByIdAssociado(id)
-                .orElseThrow(()-> new RuntimeException("Associado não encontrado"));
+    public boolean delete(Long id) throws AssociadoException {
+        Associado associadoData = associadoRepository.findByIdAssociado(id)
+                .orElseThrow(()-> new AssociadoException(Errors.ASSOCIADO_NOT_FOUND));
+        associadoRepository.deleteByIdAssociado(associadoData.getIdAssociado());
+
+        return true;
     }
 }

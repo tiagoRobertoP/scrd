@@ -1,5 +1,7 @@
 package com.teste.scrd.service;
 
+import com.teste.scrd.enums.Errors;
+import com.teste.scrd.exceptions.VotacaoException;
 import com.teste.scrd.model.Pauta;
 import com.teste.scrd.model.Votacao;
 import com.teste.scrd.repository.PautaRepository;
@@ -17,8 +19,11 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class VotacaoService {
-    @Autowired
     private VotacaoRepository votacaoRepository;
+
+    public VotacaoService(VotacaoRepository votacaoRepository) {
+        this.votacaoRepository = votacaoRepository;
+    }
 
     public Page<Votacao> get(Pageable pageable) {
         List<Votacao> votacaoList = votacaoRepository.findAll();
@@ -35,9 +40,9 @@ public class VotacaoService {
         return votacaoRepository.save(votacao);
     }
 
-    public Votacao update(Votacao votacao) {
+    public Votacao update(Votacao votacao) throws VotacaoException {
         Votacao votacaoData = votacaoRepository.findByIdVotacao(votacao.getIdVotacao())
-                .orElseThrow(()-> new RuntimeException("Votacao não encontrada"));
+                .orElseThrow(()-> new VotacaoException(Errors.VOTACAO_NOT_FOUND));
         return votacaoRepository.save(Votacao.builder()
                 .idVotacao(votacaoData.getIdVotacao())
                         .pauta(votacao.getPauta())
@@ -47,13 +52,14 @@ public class VotacaoService {
                 .build());
     }
 
-    public void delete(Long id) {
-        votacaoRepository.deleteByIdVotacao(id)
-                .orElseThrow(()-> new RuntimeException("Votacao não encontrada"));
+    public void delete(Long id) throws VotacaoException {
+        Votacao votacaoData = votacaoRepository.findByIdVotacao(id)
+                .orElseThrow(()-> new VotacaoException(Errors.VOTACAO_NOT_FOUND));
+        votacaoRepository.deleteByIdVotacao(votacaoData.getIdVotacao());
     }
 
-    public Votacao getById(Long id) {
+    public Votacao getById(Long id) throws VotacaoException {
         return votacaoRepository.findByIdVotacao(id)
-                .orElseThrow(()-> new RuntimeException("Votacao não encontrada"));
+                .orElseThrow(()-> new VotacaoException(Errors.VOTACAO_NOT_FOUND));
     }
 }

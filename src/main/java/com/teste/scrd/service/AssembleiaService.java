@@ -1,9 +1,10 @@
 package com.teste.scrd.service;
 
+import com.teste.scrd.enums.Errors;
+import com.teste.scrd.exceptions.AssembleiaException;
 import com.teste.scrd.model.Assembleia;
 import com.teste.scrd.repository.AssembleiaRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +17,11 @@ import java.util.stream.Collectors;
 @Transactional
 public class AssembleiaService {
 
-    @Autowired
     private AssembleiaRepository assembleiaRepository;
+
+    public AssembleiaService(AssembleiaRepository assembleiaRepository) {
+        this.assembleiaRepository = assembleiaRepository;
+    }
 
     public Page<Assembleia> get(Pageable pageable) {
         List<Assembleia> assembleiaList = assembleiaRepository.findAll();
@@ -34,17 +38,18 @@ public class AssembleiaService {
         return assembleiaRepository.save(assembleia);
     }
 
-    public Assembleia update(Assembleia assembleia) {
+    public Assembleia update(Assembleia assembleia) throws AssembleiaException {
         Assembleia assembleiaData = assembleiaRepository.findByIdAssembleia(assembleia.getIdAssembleia())
-                .orElseThrow(()-> new RuntimeException("Assembleia não encontrada"));
+                .orElseThrow(()-> new AssembleiaException(Errors.ASSEMBLEIA_NOT_FOUND));
         return assembleiaRepository.save(Assembleia.builder()
                 .idAssembleia(assembleiaData.getIdAssembleia())
                 .descricao(assembleia.getDescricao())
                 .build());
     }
 
-    public void delete(Long id) {
-        assembleiaRepository.deleteByIdAssembleia(id)
-                .orElseThrow(()-> new RuntimeException("Assembleia não encontrada"));
+    public void delete(Long id) throws AssembleiaException {
+        Assembleia assembleiaData = assembleiaRepository.findByIdAssembleia(id)
+                .orElseThrow(()-> new AssembleiaException(Errors.ASSEMBLEIA_NOT_FOUND));
+        assembleiaRepository.deleteByIdAssembleia(assembleiaData.getIdAssembleia());
     }
 }
